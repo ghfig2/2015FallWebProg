@@ -7,7 +7,8 @@ Features:
 Profile Management:
 - User registration
 - Edit/Update profile
-- Evolution report
+- Body metrics
+- Progress report
 - Login
 - Logout
 
