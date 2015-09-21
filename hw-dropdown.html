@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dropdown Menu</title>
+    <style type="text/css">
+        a {
+            font-family: arial;
+            font-size: 16px;
+            color: #CCCCCC;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            color: #3366FF;
+        }
+        ul {
+            background: #333399;
+            margin: 10px;
+        }
+        li {
+            display: inline-block;
+            position: relative;
+            padding: 10px 50px;
+        }
+        li:hover > ul {
+            display: block;
+        }
+        ul ul {
+            position: absolute;
+            display: none;
+            padding: 10px 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>DROPDOWN MENU</h1>
+
+    <ul>
+        <li><a href="#">HOME</a>
+        </li>
+        <li><a href="#">LIST</a>
+            <ul>
+                <li><a href="#">Option1</a></li>
+                <li><a href="#">Option2</a></li>
+                <li><a href="#">Option3</a></li>
+            </ul>
+        </li>
+        <li><a href="#">CONTACT</a></li>
+        <li><a href="#">LOGOUT</a></li>
+    </ul>
+
+</body>
+
+</html>
