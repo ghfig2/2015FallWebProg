@@ -4,11 +4,10 @@ session_start();
 $exercises = $_SESSION['fitrak'];
 $goal = $_SESSION['goal'];
 $totalCaloriesBurned = 0;
+
 if ($_POST) {
-    echo"<script>alert(1);</script>";
     if (isset($_POST['goal'])) {
         $goal = $_POST['goal'];
-        echo "<br> <br> <br> <br> o goal é $goal";
     } else if (isset($_GET['edit'])) {
         $exercises[$_GET['edit']] = $_POST;
     } else {
