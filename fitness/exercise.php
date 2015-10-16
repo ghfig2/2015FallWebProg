@@ -2,14 +2,23 @@
 
 session_start();
 $exercises = $_SESSION['fitrak'];
-
+$goal = $_SESSION['goal'];
+$totalCaloriesBurned = 0;
 if ($_POST) {
-    if (isset($_GET['id'])) {
-        $exercises[$_GET['id']] = $_POST;
+    echo"<script>alert(1);</script>";
+    if (isset($_POST['goal'])) {
+        $goal = $_POST['goal'];
+        echo "<br> <br> <br> <br> o goal é $goal";
+    } else if (isset($_GET['edit'])) {
+        $exercises[$_GET['edit']] = $_POST;
     } else {
         $exercises[] = $_POST;
     }
+
     $_SESSION['fitrak'] = $exercises;
+    $_SESSION['goal'] = $goal;
+    header('Location: exercise.php');
+
 }
 
 if (isset($_GET['edit'])) {
@@ -21,7 +30,6 @@ if (isset($_GET['edit'])) {
     $exercise = array();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
    <head>
@@ -29,7 +37,7 @@ if (isset($_GET['edit'])) {
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-      <title>Bootstrap // Guilherme</title>
+      <title>Fitrack // Get fit!</title>
       <!-- Bootstrap -->
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
       <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -40,6 +48,7 @@ if (isset($_GET['edit'])) {
       <![endif]-->
    </head>
    <body>
+      <!-- Fixed navbar -->
       <nav class="navbar navbar-default navbar-fixed-top">
          <div class="container">
             <div class="navbar-header">
@@ -71,7 +80,17 @@ if (isset($_GET['edit'])) {
          <br>
          <br>
          <div class="row">
-            <div class="col-md-5">
+            <div class="col-md-6">
+               <form class="form-inline" role="form" action="" method="POST">
+                  <div class="form-group">
+                     <h3>My goal is to burn
+                        <input type="number" class="form-control input-lg" name="goal" id="goal" value="<?=$goal;?>" required>
+                        calories &nbsp;
+                     </h3>
+                  </div>
+                  <button type="submit" class="btn btn-success btn-lg">I'm Ready!</button>
+               </form>
+               <hr>
                <h3>What have you done?</h3>
                <h5>Add more activities in your log</h5>
                <p>
@@ -82,7 +101,7 @@ if (isset($_GET['edit'])) {
                   <input type="hidden" name="type" value="Aerobic">
                   <div class="form-group" id="aerobic-exercises">
                      <label for="exercise">Select the exercise you did:</label>
-                     <select class="form-control" name="exercise" id="exercise" required>
+                     <select class="form-control" name="exercise" id="aerobic-list" required>
                         <option disabled selected value=''>-- Select --</option>
                         <option>Running</option>
                         <option>Bicycling</option>
@@ -105,7 +124,7 @@ if (isset($_GET['edit'])) {
                   <input type="hidden" name="type" value="Work Out">
                   <div class="form-group" id="workout-exercises">
                      <label for="exercise">Select the exercise you did:</label>
-                     <select class="form-control" name="exercise" id="exercise" required>
+                     <select class="form-control" name="exercise" id="workout-list" required>
                         <option disabled selected value=''>-- Select --</option>
                         <option>Abdominal</option>
                         <option>Back</option>
@@ -145,12 +164,14 @@ if (isset($_GET['edit'])) {
                   <tbody>
                      <?php 
                         foreach($exercises as $id => $ex): 
-                        if ($ex['type'] == "Aerobic") { ?>
+                            if ($ex['type'] == "Aerobic") { 
+                                $caloriesBurned = $ex['duration'] * $ex['distance'] * 10;
+                                $totalCaloriesBurned += $caloriesBurned; ?>
                      <tr>
                         <td><?=$ex['exercise'];?></td>
                         <td><?=$ex['duration'];?></td>
                         <td><?=$ex['distance'];?></td>
-                        <td>563</td>
+                        <td><?=$caloriesBurned;?></td>
                         <td>
                            <a href="?edit=<?=$id;?>"><span class="glyphicon glyphicon-edit text-warning"></span></a>
                            <a href="?delete=<?=$id;?>"><span class="glyphicon glyphicon-remove text-danger"></span></a>
@@ -174,12 +195,14 @@ if (isset($_GET['edit'])) {
                   <tbody>
                      <?php 
                         foreach($exercises as $id => $ex): 
-                        if ($ex['type'] == "Work Out") { ?>
+                            if ($ex['type'] == "Work Out") { 
+                            $caloriesBurned = ($ex['series'] * $ex['weight']) / 10;
+                            $totalCaloriesBurned += $caloriesBurned; ?>
                      <tr>
                         <td><?=$ex['exercise'];?></td>
                         <td><?=$ex['series'];?></td>
                         <td><?=$ex['weight'];?></td>
-                        <td>563</td>
+                        <td><?=($ex['series']*$ex['weight'])/10;?></td>
                         <td>
                            <a href="?edit=<?=$id;?>"><span class="glyphicon glyphicon-edit text-warning"></span></a>
                            <a href="?delete=<?=$id;?>"><span class="glyphicon glyphicon-remove text-danger"></span></a>
@@ -190,6 +213,12 @@ if (isset($_GET['edit'])) {
                   </tbody>
                </table>
                <hr>
+               <?php $progress = ($totalCaloriesBurned * 100) / $goal; ?>
+               <h2>Your progress:</h2>
+               <div class="progress">
+                  <div class="progress-bar progress-bar-warning progress-bar-striped  active" role="progressbar" aria-valuenow="<?=$progress;?>" aria-valuemin="0" aria-valuemax="100" style="width:<?=$progress;?>%"><?=$progress;?>'%
+                  </div>
+               </div>
             </div>
          </div>
          <!-- Site footer -->
@@ -204,38 +233,39 @@ if (isset($_GET['edit'])) {
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
       <script>
          $(document).ready(function(){
+             $('#goal').css('width', '100px')
              var edtion = '<?php echo $_GET["edit"]; ?>';
              if(edtion) {
                  var type = '<?php echo $exercise["type"]; ?>';
                  if (type == "Aerobic") {
-                $("#aerobic").prop("class","btn btn-primary btn-lg");
-                $("#workout").prop("class","btn btn-default btn-lg");
-                $("#workout").prop("disabled","disabled");
-                $("#aerobic-form").show();
-                     
-               } else if (type == "Work Out"){
-                $("#workout").prop("class","btn btn-primary btn-lg");
-                $("#aerobic").prop("class","btn btn-default btn-lg");
-                $("#aerobic").prop("disabled","disabled");
-                $("#workout-form").show();
-                   
-               }
+                     $("#aerobic").prop("class","btn btn-primary btn-lg");
+                     $("#workout").prop("class","btn btn-default btn-lg");
+                     $("#workout").prop("disabled","disabled");
+                     $("#aerobic-form").show();
+                     $("#aerobic-list").val("<?php echo $exercise['exercise']; ?>");
+                 } else if (type == "Work Out"){
+                     $("#workout").prop("class","btn btn-primary btn-lg");
+                     $("#aerobic").prop("class","btn btn-default btn-lg");
+                     $("#aerobic").prop("disabled","disabled");
+                     $("#workout-form").show();
+                     $("#workout-list").val("<?php echo $exercise['exercise']; ?>");
+                 }
              }
          });
          
-            $("#aerobic").click(function(){
-                $("#aerobic").prop("class","btn btn-primary btn-lg");
-                $("#workout").prop("class","btn btn-default btn-lg disabled");
-                $("#workout-form").hide();
-                $("#aerobic-form").show();
-            });
-            
-            $("#workout").click(function(){
-                $("#workout").prop("class","btn btn-primary btn-lg");
-                $("#aerobic").prop("class","btn btn-default btn-lg disabled");
-                $("#aerobic-form").hide();
-                $("#workout-form").show();
-            });
+         $("#aerobic").click(function(){
+             $("#aerobic").prop("class","btn btn-primary btn-lg");
+             $("#workout").prop("class","btn btn-default btn-lg disabled");
+             $("#workout-form").hide();
+             $("#aerobic-form").show();
+         });
+         
+         $("#workout").click(function(){
+             $("#workout").prop("class","btn btn-primary btn-lg");
+             $("#aerobic").prop("class","btn btn-default btn-lg disabled");
+             $("#aerobic-form").hide();
+             $("#workout-form").show();
+         });
       </script>
    </body>
 </html>
