@@ -1,8 +1,8 @@
 <?php
 
 session_start();
-$exercises = $_SESSION['fitrak'];
-$goal = $_SESSION['goal'];
+$exercises           = $_SESSION['fitrak'];
+$goal                = $_SESSION['goal'];
 $totalCaloriesBurned = 0;
 
 if ($_POST) {
@@ -13,11 +13,11 @@ if ($_POST) {
     } else {
         $exercises[] = $_POST;
     }
-
+    
     $_SESSION['fitrak'] = $exercises;
-    $_SESSION['goal'] = $goal;
+    $_SESSION['goal']   = $goal;
     header('Location: exercise.php');
-
+    
 }
 
 if (isset($_GET['edit'])) {
@@ -29,6 +29,7 @@ if (isset($_GET['edit'])) {
     $exercise = array();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
    <head>
@@ -162,6 +163,7 @@ if (isset($_GET['edit'])) {
                   </thead>
                   <tbody>
                      <?php 
+                     if(isset($exercises)) {
                         foreach($exercises as $id => $ex): 
                             if ($ex['type'] == "Aerobic") { 
                                 $caloriesBurned = $ex['duration'] * $ex['distance'] * 10;
@@ -177,7 +179,11 @@ if (isset($_GET['edit'])) {
                         </td>
                      </tr>
                      <?php }
-                        endforeach; ?>
+                        endforeach;
+                     } else {
+                        echo"<tr><td>No records found</td></tr>";
+                     }
+                     ?>
                   </tbody>
                </table>
                <h4>Work Out</h4>
@@ -192,7 +198,8 @@ if (isset($_GET['edit'])) {
                      </tr>
                   </thead>
                   <tbody>
-                     <?php 
+                     <?php
+                     if(isset($exercises)) {
                         foreach($exercises as $id => $ex): 
                             if ($ex['type'] == "Work Out") { 
                             $caloriesBurned = ($ex['series'] * $ex['weight']) / 10;
@@ -208,11 +215,21 @@ if (isset($_GET['edit'])) {
                         </td>
                      </tr>
                      <?php }
-                        endforeach; ?>
+                        endforeach;
+                     } else {
+                        echo"<tr><td>No records found</td></tr>";
+                     }
+                     ?>
                   </tbody>
                </table>
                <hr>
-               <?php $progress = ($totalCaloriesBurned * 100) / $goal; ?>
+               <?php
+               if(isset($exercises)) {
+                  $progress = ($totalCaloriesBurned * 100) / $goal;
+               } else {
+                  $progress = 0;
+               }
+               ?>
                <h2>Your progress:</h2>
                <div class="progress">
                   <div class="progress-bar progress-bar-warning progress-bar-striped  active" role="progressbar" aria-valuenow="<?=$progress;?>" aria-valuemin="0" aria-valuemax="100" style="width:<?=$progress;?>%"><?=$progress;?>'%
